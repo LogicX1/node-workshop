@@ -1,15 +1,18 @@
-var http = require('http');
-var fs = require('fs');
+const http = require('http');
+const fs = require('fs');
 const path = require('path');
-var message = ' Me is happy me is doing workshop ';
+const querystring = require('querystring');
+
+const message = ' Me is happy me is doing workshop ';
+
 
 function handler (request , response) {
     var endpoint = request.url;
     console.log(endpoint);
     var method = request.method;
     console.log(method);
-
-
+    var allTheData='';
+  
     if(endpoint === '/'){
         response.writeHead(200,{'Content-Type':'text/html'});
         fs.readFile(__dirname +'/public/index.html',(error,file)=> {
@@ -29,6 +32,16 @@ function handler (request , response) {
         response.writeHead(200,{'Content-Type':'text/html'});
         response.write('Welcome to girls page');
         response.end();
+
+    }else if (endpoint === '/create-post'){
+        request.on('data',(chunkOfData) =>allTheData+=chunkOfData);
+    
+        request.on('end',()=>{
+            response.writeHead(301,{"Location":'/'});
+            let convertedData = querystring.parse(allTheData);
+            console.log(allTheData);
+            response.end();
+        });
 
     }else{
         var extension = endpoint.split('.')[1];
@@ -56,6 +69,8 @@ function handler (request , response) {
             
         }); 
     }
+
+   
 }
 
 // response.writeHead(404,{'Content-Type':'text/html'});
